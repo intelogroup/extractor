@@ -1,18 +1,1 @@
-app_settings:
-  title: "AI-Powered PDF Analyzer"
-  max_file_size: 10
-  supported_files: ["pdf"]
 
-gemini_settings:
-  model: "gemini-pro"
-  max_tokens: 1000
-  temperature: 0.3
-
-extraction_fields:
-  - title
-  - authors
-  - year
-  - journal
-  - doi
-  - abstract
-  - keywords
