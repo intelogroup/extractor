@@ -1,0 +1,5 @@
+streamlit
+PyPDF2
+gspread
+google-auth
+pip-tools
