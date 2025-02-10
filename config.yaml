@@ -1,29 +1,18 @@
-app_title: "PDF Bibliography Extractor"
-max_file_limit: 10
-batch_size: 100
-default_settings:
-  create_new_sheet: true
-  use_batch_mode: true
-  include_abstract: true
-  max_files: 2
+app_settings:
+  title: "AI-Powered PDF Analyzer"
+  max_file_size: 10
+  supported_files: ["pdf"]
 
-sheet_headers:
-  - Title
-  - Authors
-  - Year
-  - Journal
-  - DOI
-  - Abstract
-  - Timestamp
+gemini_settings:
+  model: "gemini-pro"
+  max_tokens: 1000
+  temperature: 0.3
 
-extraction_patterns:
-  title:
-    - '^(.+?)(?:\n|$)'
-    - '(?i)title[:\s]+(.+?)(?:\n|$)'
-  authors:
-    - '(?:Author[s]?:|by)\s*((?:[A-Z][a-z]+\s+[A-Z][a-z]+(?:,\s*|\s+and\s+|$))+)'
-    - '(?:^|\n)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+(?:,\s*(?:[A-Z][a-z]+\s+[A-Z][a-z]+))*)'
-  year:
-    - '\b(19|20)\d{2}\b'
-    - 'Published.*?(\d{4})'
-    - '©.*?(\d{4})'
+extraction_fields:
+  - title
+  - authors
+  - year
+  - journal
+  - doi
+  - abstract
+  - keywords
