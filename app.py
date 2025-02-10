@@ -1,4 +1,12 @@
 import streamlit as st
+import subprocess
+import sys
+
+def install_packages():
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "PyPDF2==3.0.1"])
+
+install_packages()
+
 import PyPDF2
 import json
 import os
@@ -6,6 +14,7 @@ from datetime import datetime
 from sheets_manager import init_sheets_client, export_to_sheet, batch_export
 from pdf_processor import extract_pdf_info
 
+# Rest of your code remains the same
 def load_css():
     with open('style.css') as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
