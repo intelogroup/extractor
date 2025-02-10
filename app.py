@@ -1,73 +1,46 @@
 import streamlit as st
-import subprocess
-import sys
+import PyPDF2
+import io
+import gspread
+from google.oauth2.service_account import Credentials
 
-def install_pkgs():
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pdfplumber"])
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "google-generativeai"])
+st.set_page_config(page_title="PDF Reference Extractor")
 
-install_pkgs()
+st.title("PDF Reference Extractor")
 
-import pdfplumber
-import pandas as pd
-import google.generativeai as genai
-from datetime import datetime
-
-# Configure Gemini API
-GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
-genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-pro')
-
-def extract_text(pdf_file):
-    with pdfplumber.open(pdf_file) as pdf:
-        text = ""
-        for page in pdf.pages:
-            text += page.extract_text() + "\n"
-    return text
-
-def analyze_with_gemini(text):
-    prompt = """Analyze this academic text and extract as JSON:
-    1. Title
-    2. Authors
-    3. Year
-    4. Abstract
-    5. Keywords
-    6. Main findings
-    
-    Text: {text}"""
-    
+def extract_pdf_info(pdf_file):
     try:
-        response = model.generate_content(prompt.format(text=text))
-        return response.text
+        pdf_reader = PyPDF2.PdfReader(pdf_file)
+        first_page = pdf_reader.pages[0].extract_text()
+        
+        # Basic extraction (we'll improve this later)
+        info = {
+            'title': first_page.split('\n')[0],
+            'authors': 'Not implemented',
+            'year': 'Not implemented',
+            'journal': 'Not implemented',
+            'doi': 'Not implemented'
+        }
+        return info
     except Exception as e:
-        st.error(f"Gemini API Error: {str(e)}")
+        st.error(f"Error processing PDF: {str(e)}")
         return None
 
-def main():
-    st.title("AI-Powered PDF Analyzer")
-    
-    uploaded_file = st.file_uploader("Upload academic PDF", type="pdf")
-    
-    if uploaded_file:
-        col1, col2 = st.columns(2)
-        
-        with st.spinner('Processing PDF...'):
-            try:
-                text = extract_text(uploaded_file)
-                
-                with col1:
-                    st.subheader("Extracted Text")
-                    st.text_area("", text[:1000] + "...", height=300)
-                
-                analysis = analyze_with_gemini(text)
-                
-                with col2:
-                    st.subheader("AI Analysis")
-                    if analysis:
-                        st.json(analysis)
-                    
-            except Exception as e:
-                st.error(f"Error: {str(e)}")
+# File upload
+uploaded_files = st.file_uploader("Upload PDF files", type="pdf", accept_multiple_files=True)
 
-if __name__ == "__main__":
-    main()
+if uploaded_files:
+    for pdf_file in uploaded_files[:2]:  # Limit to 2 files
+        st.write(f"Processing: {pdf_file.name}")
+        
+        info = extract_pdf_info(pdf_file)
+        if info:
+            st.write("Extracted Information:")
+            for key, value in info.items():
+                st.write(f"{key}: {value}")
+            
+            if st.button(f"Export to Google Sheets ({pdf_file.name})"):
+                st.write("Google Sheets export not implemented yet")
+
+st.sidebar.markdown("### About")
+st.sidebar.write("Upload academic PDFs to extract bibliographic information.")
